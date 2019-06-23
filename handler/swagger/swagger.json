@@ -1,0 +1,159 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "File Web Api",
+        "description": "File web api",
+        "version": "1.0.0",
+        "termsOfService": "http://localhost:8080/",
+        "contact": {
+            "email": "zeyit17@gmail.com"
+        }
+    },
+    "basePath": "/",
+    "paths": {
+        "/file/": {
+            "post": {
+                "tags": [
+                    "file"
+                ],
+                "description": "Create file",
+                "operationId": "Post",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "description": "upload file",
+                        "required": true,
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{isSuccess:true,data: File}"
+                    },
+                    "400": {
+                        "description": "{isSuccess:false,data:\"Hata\"}"
+                    },
+                    "500": {
+                        "description": "{isSuccess:false,data:\"Hata\"}"
+                    }
+                }
+            }
+        },
+        "/file/{id}":{
+            "get": {
+                "tags": [
+                    "file"
+                ],
+                "description": "Get file",
+                "operationId": "Get",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id zorunlu alan",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{isSuccess:true,data:File}"
+                    },
+                    "400": {
+                        "description": "{isSuccess:false,data:\"Hata\"}"
+                    },
+                    "500": {
+                        "description": "{isSuccess:false,data:\"Hata\"}"
+                    }
+                }
+            },
+            "delete":{
+                "tags": [
+                    "file"
+                ],
+                "description": "Delete File",
+                "operationId": "Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id zorunlu alan",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{isSuccess:true,data:\"Message\"}"
+                    },
+                    "400": {
+                        "description": "{isSuccess:false,data:\"Hata\"}"
+                    },
+                    "500": {
+                        "description": "{isSuccess:false,data:\"Hata\"}"
+                    }
+                }
+            }
+        },
+        "/file/download/{id}":{
+            "get": {
+                "tags": [
+                    "file"
+                ],
+                "description": "Download file",
+                "operationId": "Download",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id zorunlu alan",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Download file"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "File": {
+            "title": "File",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+            
+                "name": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "extension": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "file": [
+        {
+            "name": "file",
+            "description": "Operations about file\n"
+        }
+    ]
+}
