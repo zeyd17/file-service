@@ -6,8 +6,10 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/zeyd17/file-microservice/model"
 	"github.com/zeyd17/file-microservice/repository"
 )
@@ -23,19 +25,45 @@ func NewFileApi(repo repository.IFileRepo) *FileApi {
 // Create a new File
 func (api *FileApi) Post(w http.ResponseWriter, r *http.Request) {
 
-	file := model.File{}
-	err := json.NewDecoder(r.Body).Decode(&file)
+	fileModel := model.File{}
+
+	r.ParseMultipartForm(32 << 20)
+	tmpfile, handler, err := r.FormFile("file")
 	if err != nil {
-		respondwithJSON(w, http.StatusBadRequest, err.Error())
+		respondwithJSON(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	err = api.repo.Create(&file)
+	defer tmpfile.Close()
+
+	fileModel.ID = strings.ToLower(uuid.New().String())
+	fileModel.Name = handler.Filename
+	fileModel.Size = handler.Size
+	fileModel.Format = handler.Header.Get("Content-Type")
+	extensions := strings.Split(fileModel.Name, ".")
+	ext := ""
+	if len(extensions) > 0 {
+		ext = extensions[len(extensions)-1]
+	}
+	fileModel.Extension = ext
+
+	fileName := fmt.Sprintf("./files/%s.%s", fileModel.ID, fileModel.Extension)
+
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	io.Copy(file, tmpfile)
+
+	err = api.repo.Create(&fileModel)
 
 	if err != nil {
 		respondwithJSON(w, http.StatusInternalServerError, err.Error())
 	} else {
-		respondwithJSON(w, http.StatusOK, "Successfully Created")
+		respondwithJSON(w, http.StatusOK, fileModel)
 	}
+
 }
 
 func (p *FileApi) Get(w http.ResponseWriter, r *http.Request) {
