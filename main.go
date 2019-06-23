@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/zeyd17/file-microservice/handler/api"
 	"github.com/zeyd17/file-microservice/repository"
 )
@@ -38,10 +39,10 @@ func main() {
 func fileRouter(fileApi *api.FileApi) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/{id:[a-z-]+}", fileApi.Get)
+	r.Get("/{id:[0-9-a-f-]+}", fileApi.Get)
 	r.Post("/", fileApi.Post)
-	r.Delete("/{id:[a-z-]+}", fileApi.Delete)
-	r.Get("/download/{id:[a-z-]+}", fileApi.Download)
+	r.Delete("/{id:[0-9-a-f-]+}", fileApi.Delete)
+	r.Get("/download/{id:[0-9-a-f-]+}", fileApi.Download)
 
 	return r
 }

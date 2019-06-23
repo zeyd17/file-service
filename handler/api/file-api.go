@@ -55,10 +55,11 @@ func (api *FileApi) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 	io.Copy(file, tmpfile)
-
+	fmt.Println(fileModel)
 	err = api.repo.Create(&fileModel)
 
 	if err != nil {
+
 		respondwithJSON(w, http.StatusInternalServerError, err.Error())
 	} else {
 		respondwithJSON(w, http.StatusOK, fileModel)
@@ -66,13 +67,13 @@ func (api *FileApi) Post(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (p *FileApi) Get(w http.ResponseWriter, r *http.Request) {
+func (api *FileApi) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		respondwithJSON(w, http.StatusBadRequest, "File id missing")
 		return
 	}
-	payload, err := p.repo.GetByID(id)
+	payload, err := api.repo.GetByID(id)
 
 	if err != nil {
 		respondwithJSON(w, http.StatusInternalServerError, err.Error())
@@ -81,18 +82,18 @@ func (p *FileApi) Get(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (p *FileApi) Download(w http.ResponseWriter, r *http.Request) {
+func (api *FileApi) Download(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	payload, err := p.repo.GetByID(id)
+	payload, err := api.repo.GetByID(id)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
-		f, err := os.Open(fmt.Sprintf(".files/%s.%s", payload.ID, payload.Extension))
+		f, err := os.Open(fmt.Sprintf("./files/%s.%s", payload.ID, payload.Extension))
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -108,16 +109,20 @@ func (p *FileApi) Download(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (p *FileApi) Delete(w http.ResponseWriter, r *http.Request) {
+func (api *FileApi) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		respondwithJSON(w, http.StatusBadRequest, "File id missing")
 		return
 	}
-	_, err := p.repo.Delete(id)
+
+	payload, _ := api.repo.GetByID(id)
+
+	err := api.repo.Delete(id)
 	if err != nil {
 		respondwithJSON(w, http.StatusInternalServerError, "Server Error"+err.Error())
 	} else {
+		os.Remove(fmt.Sprintf("./files/%s.%s", payload.ID, payload.Extension))
 		respondwithJSON(w, http.StatusOK, "Delete Successfully")
 	}
 }

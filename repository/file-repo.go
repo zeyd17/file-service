@@ -11,7 +11,7 @@ import (
 type IFileRepo interface {
 	GetByID(id string) (*model.File, error)
 	Create(f *model.File) error
-	Delete(id string) (bool, error)
+	Delete(id string) error
 }
 
 type FileRepo struct {
@@ -19,7 +19,8 @@ type FileRepo struct {
 }
 
 func NewFileRepo(db *gorm.DB) IFileRepo {
-	return &FileRepo{}
+	db.AutoMigrate(&model.File{})
+	return &FileRepo{db: db}
 }
 
 func (file *FileRepo) GetByID(id string) (*model.File, error) {
@@ -32,13 +33,13 @@ func (file *FileRepo) GetByID(id string) (*model.File, error) {
 func (file *FileRepo) Create(f *model.File) error {
 	return file.db.Create(f).Error
 }
-func (file *FileRepo) Delete(id string) (bool, error) {
+func (file *FileRepo) Delete(id string) error {
 	f, err := file.GetByID(id)
 	if err != nil {
-		return false, err
+		return err
 	}
 	if err = file.db.Delete(f).Error; err != nil {
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
