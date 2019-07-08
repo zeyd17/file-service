@@ -6,7 +6,7 @@ Golang ile yazılmış, basit dosya işlemleri yapan microservice dir.
 ## Kurulum
 
 ```bash
-$ go get github.com/zeyd17/file-service
+$ go get github.com/zeyit/file-service
 ```
 
 ## Rest Api
